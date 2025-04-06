@@ -1,19 +1,13 @@
 package daysteps
 
-import (
-	...
-)
+type DaySteps struct {
+	// TODO: добавить поля
+}
 
-const (
-	StepLength = 0.65
-)
+func (ds *DaySteps) Parse(datastring string) (err error) {
+	// TODO: реализовать функцию
+}
 
-// создайте структуру DaySteps
-...
-
-
-// создайте метод Parse()
-...
-
-// создайте метод ActionInfo()
-...
+func (ds DaySteps) ActionInfo() (string, error) {
+	// TODO: реализовать функцию
+}

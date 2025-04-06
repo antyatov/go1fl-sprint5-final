@@ -1,16 +1,13 @@
 package trainings
 
-import (
-	...
-)
+type Training struct {
+	// TODO: добавить поля
+}
 
-// создайте структуру Training
-...
+func (t *Training) Parse(datastring string) (err error) {
+	// TODO: реализовать функцию
+}
 
-
-// создайте метод Parse()
-...
-
-// создайте метод ActionInfo()
-...
-
+func (t Training) ActionInfo() (string, error) {
+	// TODO: реализовать функцию
+}

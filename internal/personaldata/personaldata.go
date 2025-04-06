@@ -1,10 +1,9 @@
 package personaldata
 
-import ...
+type Personal struct {
+	// TODO: добавить поля
+}
 
-// Ниже создайте структуру Personal
-...
-
-// Ниже создайте метод Print()
-...
-
+func (p Personal) Print() {
+	// TODO: реализовать функцию
+}

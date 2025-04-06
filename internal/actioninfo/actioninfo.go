@@ -1,11 +1,9 @@
 package actioninfo
 
-import (
-	...
-)
+type DataParser interface {
+	// TODO: добавить методы
+}
 
-// создайте интерфейс DataParser
-...
-
-// создайте функцию Info()
-...
+func Info(dataset []string, dp DataParser) {
+	// TODO: реализовать функцию
+}
