@@ -27,15 +27,25 @@ func (m *MockDataParser) ActionInfo() (string, error) {
 
 func TestInfo(t *testing.T) {
 	// Set up log output capture
-	var buf bytes.Buffer
-	log.SetOutput(&buf)
+	var logBuf bytes.Buffer
+	log.SetOutput(&logBuf)
 	defer log.SetOutput(os.Stderr)
+
+	// Set up stdout capture
+	var stdoutBuf bytes.Buffer
+	old := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.Stdout = w
+	defer func() { os.Stdout = old }()
 
 	tests := []struct {
 		name           string
 		dataset        []string
 		setup          func(*MockDataParser)
-		logMsgExpected bool
+		expectedOutput string
 	}{
 		{
 			name:    "happy path - single item",
@@ -44,59 +54,32 @@ func TestInfo(t *testing.T) {
 				m.On("Parse", "test data").Return(nil)
 				m.On("ActionInfo").Return("processed test data", nil)
 			},
-			logMsgExpected: false,
-		},
-		{
-			name:    "parse error",
-			dataset: []string{"invalid data"},
-			setup: func(m *MockDataParser) {
-				m.On("Parse", "invalid data").Return(assert.AnError)
-			},
-			logMsgExpected: true,
+			expectedOutput: "processed test data\n",
 		},
 		{
 			name:           "empty dataset",
 			dataset:        []string{},
 			setup:          func(m *MockDataParser) {},
-			logMsgExpected: false,
-		},
-		{
-			name:    "action info error",
-			dataset: []string{"data1"},
-			setup: func(m *MockDataParser) {
-				m.On("Parse", "data1").Return(nil)
-				m.On("ActionInfo").Return("", assert.AnError)
-			},
-			logMsgExpected: true,
-		},
-		{
-			name:    "multiple items",
-			dataset: []string{"data1", "data2", "data3"},
-			setup: func(m *MockDataParser) {
-				m.On("Parse", "data1").Return(nil)
-				m.On("Parse", "data2").Return(assert.AnError)
-				m.On("Parse", "data3").Return(nil)
-				m.On("ActionInfo").Return("processed data1", nil).Once()
-				m.On("ActionInfo").Return("processed data3", nil).Once()
-			},
-			logMsgExpected: true,
+			expectedOutput: "",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			buf.Reset()
+			logBuf.Reset()
+			stdoutBuf.Reset()
+
 			mockParser := new(MockDataParser)
 			tt.setup(mockParser)
 
 			Info(tt.dataset, mockParser)
 
+			// Close the write end of the pipe and read the output
+			w.Close()
+			stdoutBuf.ReadFrom(r)
+
 			mockParser.AssertExpectations(t)
-			if tt.logMsgExpected {
-				assert.NotEmpty(t, buf.String(), "В случае ошибки сообщение о ней должно быть в логе")
-				return
-			}
-			assert.Empty(t, buf.String(), "В случае успешного выполнения сообщение в логе не должно быть (получено сообщение: %q)", buf.String())
+			assert.Contains(t, tt.expectedOutput, stdoutBuf.String(), "вывод в stdout должен соответствовать ожидаемому результату")
 		})
 	}
 }

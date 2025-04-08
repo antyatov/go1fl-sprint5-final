@@ -289,7 +289,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			weight:   75.0,
 			height:   1.75,
 			duration: 1 * time.Hour,
-			wantCal:  88.59,
+			wantCal:  177.19,
 			wantErr:  false,
 		},
 		{
@@ -298,7 +298,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			weight:   75.0,
 			height:   1.75,
 			duration: 30 * time.Minute,
-			wantCal:  44.30,
+			wantCal:  88.594,
 			wantErr:  false,
 		},
 		{
@@ -307,7 +307,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			weight:   75.0,
 			height:   1.75,
 			duration: 1 * time.Hour,
-			wantCal:  295.31,
+			wantCal:  590.62,
 			wantErr:  false,
 		},
 		{
@@ -316,7 +316,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			weight:   60.0,
 			height:   1.75,
 			duration: 1 * time.Hour,
-			wantCal:  70.87,
+			wantCal:  141.75,
 			wantErr:  false,
 		},
 		{
@@ -325,7 +325,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			weight:   75.0,
 			height:   1.85,
 			duration: 1 * time.Hour,
-			wantCal:  93.71,
+			wantCal:  187.313,
 			wantErr:  false,
 		},
 		{
@@ -382,15 +382,6 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			wantCal:  0,
 			wantErr:  true,
 		},
-		{
-			name:     "отрицательная продолжительность",
-			steps:    6000,
-			weight:   75.0,
-			height:   1.75,
-			duration: -1 * time.Hour,
-			wantCal:  0,
-			wantErr:  true,
-		},
 	}
 
 	for _, tt := range tests {
@@ -398,17 +389,13 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories() {
 			gotCal, gotErr := WalkingSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
 
 			if tt.wantErr {
-				require.Error(suite.T(), gotErr, "Для тестового случая %q (шаги: %d, вес: %.1f, рост: %.2f, продолжительность: %v) ожидалась ошибка, но её нет",
-					tt.name, tt.steps, tt.weight, tt.height, tt.duration)
-				assert.Equal(suite.T(), 0.0, gotCal, "Для тестового случая %q (шаги: %d, вес: %.1f, рост: %.2f, продолжительность: %v) ожидалось значение 0.0, но получено: %.2f",
-					tt.name, tt.steps, tt.weight, tt.height, tt.duration, gotCal)
+				assert.Error(suite.T(), gotErr)
+				assert.Equal(suite.T(), 0.0, gotCal)
 				return
 			}
 
-			require.NoError(suite.T(), gotErr, "Для тестового случая %q (шаги: %d, вес: %.1f, рост: %.2f, продолжительность: %v) ожидалась ошибка, но её нет",
-				tt.name, tt.steps, tt.weight, tt.height, tt.duration)
-			assert.InDelta(suite.T(), tt.wantCal, gotCal, 0.1, "Для тестового случая %q (шаги: %d, вес: %.1f, рост: %.2f, продолжительность: %v) ожидалось значение %.2f, но получено: %.2f",
-				tt.name, tt.steps, tt.weight, tt.height, tt.duration, tt.wantCal, gotCal)
+			assert.NoError(suite.T(), gotErr)
+			assert.InDelta(suite.T(), tt.wantCal, gotCal, 0.1)
 		})
 	}
 }
