@@ -55,7 +55,7 @@ func (t Training) ActionInfo() (string, error) {
 
 	switch strings.ToLower(t.TrainingType) {
 	case "ходьба":
-		calories, err := spentenergy.WalkingSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Weight, t.Duration)
+		calories, err := spentenergy.WalkingSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Height, t.Duration)
 		if err != nil {
 			return "", fmt.Errorf("failed calc calories: %w", err)
 		}
@@ -63,7 +63,7 @@ func (t Training) ActionInfo() (string, error) {
 		return fmt.Sprintf(message, t.TrainingType, t.Duration.Hours(), distance, speed, calories), nil
 
 	case "бег":
-		calories, err := spentenergy.RunningSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Weight, t.Duration)
+		calories, err := spentenergy.RunningSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Height, t.Duration)
 		if err != nil {
 			return "", fmt.Errorf("failed calc calories: %w", err)
 		}
