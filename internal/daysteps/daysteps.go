@@ -36,7 +36,7 @@ func (ds *DaySteps) Parse(datastring string) (err error) {
 	}
 
 	if steps <= 0 || duration <= 0 {
-		return fmt.Errorf("steps count (%d) or wall duration (%d) cannot will be zero or negative value: %w", steps, duration, err)
+		return fmt.Errorf("steps (%d) or wall duration (%s) must be greater than zero", steps, duration)
 	}
 
 	ds.Steps = steps
@@ -46,19 +46,15 @@ func (ds *DaySteps) Parse(datastring string) (err error) {
 }
 
 func (ds DaySteps) ActionInfo() (string, error) {
-	message := "Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.\n"
-	steps := ds.Steps
-	weight := ds.Personal.Weight
-	height := ds.Personal.Height
-	duration := ds.Duration
+	distance := spentenergy.Distance(ds.Steps, ds.Personal.Height)
 
-	distance := spentenergy.Distance(steps, height)
-
-	calories, err := spentenergy.WalkingSpentCalories(steps, weight, height, duration)
+	calories, err := spentenergy.WalkingSpentCalories(ds.Steps, ds.Personal.Weight, ds.Personal.Height, ds.Duration)
 
 	if err != nil {
 		return "", fmt.Errorf("failed calc calories: %w", err)
 	}
 
-	return fmt.Sprintf(message, steps, distance, calories), nil
+	message := "Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.\n"
+
+	return fmt.Sprintf(message, ds.Steps, distance, calories), nil
 }

@@ -37,7 +37,7 @@ func (t *Training) Parse(datastring string) (err error) {
 	}
 
 	if steps <= 0 || duration <= 0 {
-		return fmt.Errorf("steps count (%d) or wall duration (%d) cannot will be zero or negative value: %w", steps, duration, err)
+		return fmt.Errorf("steps (%d) or wall duration (%s) must be greater than zero", steps, duration)
 	}
 
 	t.Steps = steps
@@ -48,36 +48,29 @@ func (t *Training) Parse(datastring string) (err error) {
 }
 
 func (t Training) ActionInfo() (string, error) {
-
-	steps := t.Steps
-	weight := t.Personal.Weight
-	height := t.Personal.Height
-	duration := t.Duration
-	activity := t.TrainingType
+	distance := spentenergy.Distance(t.Steps, t.Personal.Height)
+	speed := spentenergy.MeanSpeed(t.Steps, t.Personal.Height, t.Duration)
 
 	message := "Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f\n"
 
-	distance := spentenergy.Distance(steps, height)
-	speed := spentenergy.MeanSpeed(steps, height, duration)
-
-	switch strings.ToLower(activity) {
+	switch strings.ToLower(t.TrainingType) {
 	case "ходьба":
-		calories, err := spentenergy.WalkingSpentCalories(steps, weight, height, duration)
+		calories, err := spentenergy.WalkingSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Weight, t.Duration)
 		if err != nil {
 			return "", fmt.Errorf("failed calc calories: %w", err)
 		}
 
-		return fmt.Sprintf(message, activity, duration.Hours(), distance, speed, calories), nil
+		return fmt.Sprintf(message, t.TrainingType, t.Duration.Hours(), distance, speed, calories), nil
 
 	case "бег":
-		calories, err := spentenergy.RunningSpentCalories(steps, weight, height, duration)
+		calories, err := spentenergy.RunningSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Weight, t.Duration)
 		if err != nil {
 			return "", fmt.Errorf("failed calc calories: %w", err)
 		}
 
-		return fmt.Sprintf(message, activity, duration.Hours(), distance, speed, calories), nil
+		return fmt.Sprintf(message, t.TrainingType, t.Duration.Hours(), distance, speed, calories), nil
 
 	default:
-		return "", fmt.Errorf("unknown activity kind\n(неизвестный тип тренировки):\n%s", activity)
+		return "", fmt.Errorf("unknown activity kind\n(неизвестный тип тренировки):\n%s", t.TrainingType)
 	}
 }
