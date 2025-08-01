@@ -2,9 +2,11 @@ name: Unit tests
 
 on:
   push:
-    branches: '**'
+    branches:
+    - '**'
   pull_request:
-    branches: '**'
+    branches:
+    - '**'
 
 jobs:
   unit-tests:
@@ -12,8 +14,8 @@ jobs:
     container: golang:1.24
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Run unit tests
-        run: go test -v ./...
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run unit tests
+      run: go test -v ./...
