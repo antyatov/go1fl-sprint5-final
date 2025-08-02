@@ -21,6 +21,7 @@ func Info(dataset []string, dp DataParser) {
 		message, err := dp.ActionInfo()
 		if err != nil {
 			log.Println("failed get action info: %w", err)
+			continue
 		}
 
 		fmt.Println(message)
