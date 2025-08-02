@@ -35,8 +35,12 @@ func (ds *DaySteps) Parse(datastring string) (err error) {
 		return fmt.Errorf("cannot parce time duration: %w", err)
 	}
 
-	if steps <= 0 || duration <= 0 {
-		return fmt.Errorf("steps (%d) or wall duration (%s) must be greater than zero", steps, duration)
+	if steps <= 0 {
+		return fmt.Errorf("steps (%d) must be greater than zero", steps)
+	}
+
+	if duration <= 0 {
+		return fmt.Errorf("duration (%s) must be greater than zero", duration)
 	}
 
 	ds.Steps = steps
